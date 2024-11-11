@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
+import { createAccount } from "@/lib/actions/user.actions";
 
 const authFormSchema = (formType: FormType) => {
   return z.object({
@@ -34,6 +35,7 @@ type FormType = "sign-in" | "sign-up";
 const AuthForm = ({ type }: { type: FormType }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [accountId, setAccountId] = useState(null);
 
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,7 +47,21 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      const user = await createAccount({
+        fullName: values.fullName || "",
+        email: values.email,
+      });
+
+      setAccountId(user.accountId);
+    } catch {
+      setErrorMessage("Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -83,7 +99,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
             render={({ field }) => (
               <FormItem>
                 <div className="shad-form-item">
-                  <FormLabel className="shad-form-label">email</FormLabel>
+                  <FormLabel className="shad-form-label">Email</FormLabel>
                   <FormControl>
                     <Input
                       className="shad-input"
