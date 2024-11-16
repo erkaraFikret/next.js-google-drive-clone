@@ -16,7 +16,7 @@ const Header = ({
     <header className="header">
       <Search />
       <div className="header-wrapper">
-        <FileUploader/>
+        <FileUploader ownerId={userId} accountId={accountId}/>
         <form
           action={async () => {
             "use server";
